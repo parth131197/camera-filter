@@ -1,0 +1,23 @@
+<div id="videoPlayerContainer" fxLayout="row" fxLayoutAlign="center center" class="video-player-container">
+  <div fxLayout="column" id="videoPlayerComponents" class="video-player-component-container" fxFlex="60" fxFlex.xs="90">
+      <video id="videoPlayer" class="video-player"></video>
+
+      <canvas id="videoPlayerCanvas" class="video-player-canvas"></canvas>
+      <div id="videoFilterContainer" class="videoFilterContainer" fxLayout="row" fxLayoutGap="10px" fxLayoutAlign="start center">
+
+      </div>
+      <div id="videoButtonsContainer" class="videoButtonsContainer" fxLayout="row" fxLayoutAlign="space-around center">
+        <div fxFlex="33.33" fxLayout="row" fxLayoutAlign="start center">
+          <div class="filterIcon" (click)="changeFilterStatus()"></div>
+        </div>
+        <div fxFlex="33.33" fxLayout="row" fxLayoutAlign="center center">
+          <div id="recordButton" class="record-button"></div>
+        </div>
+        <div fxFlex="33.33" fxLayout="row" fxLayoutAlign="end center">
+          <button id="downloadButton" class="sendButton">Send</button>
+        </div>
+      </div>
+  </div>
+  <!-- <div id="recordingDiv" class="recordingAnimation"></div> -->
+</div>
+
