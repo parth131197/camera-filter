@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import * as filters from 'opentok-camera-filters/src/filters.js';
+import * as filters from 'opentok-camera-filters-new/src/filters.js';
 
 
 declare var MediaRecorder: any;
