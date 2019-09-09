@@ -11,14 +11,24 @@ declare var MediaRecorder: any;
 })
 export class Video2Component implements OnInit {
 
-  constructor() { }
+  public readonly TEMP_TIMER_SECONDS:any = 13;
 
   currentFilter;
+  timerCount = this.TEMP_TIMER_SECONDS;
+  intervalReference:any;
+  showCounter: boolean = true;
+
+  constructor() { }
 
   ngOnInit() {
     this.initVideoRecorder();
   }
 
+  ngOnDestroy(){
+    if(this.intervalReference){
+      clearInterval(this.intervalReference);
+    }
+  }
   initVideoRecorder(){
     const canvas:any = document.getElementById('videoPlayerCanvas');
 
@@ -31,39 +41,31 @@ export class Video2Component implements OnInit {
       videoElement.srcObject = stream;
       videoElement.muted = true;
       videoElement.setAttribute('id', 'videoPlayer');
-      // videoElement.setAttribute('height',window.innerHeight);
-      // videoElement.setAttribute('width',window.innerWidth);
-
+      
       videoElement.setAttribute('playsinline', '');
       setTimeout(() => {
         videoElement.play();
       });
       videoElement.addEventListener('loadedmetadata', () => {
-        // canvas.width = videoElement.videoWidth;
-        // canvas.height = videoElement.videoHeight;
         canvas.setAttribute('width',videoElement.videoWidth);
         canvas.setAttribute('height',videoElement.videoHeight);
 
         let context = canvas.getContext('2d', {alpha: false});
         let canvasStream = canvas.captureStream();
 
-        this.filterPicker(videoElement, canvas, filters, document.body);
+        this.filterPicker(videoElement, canvas, filters, document.body, stream);
         if (stream.getAudioTracks().length) {
           canvasStream.addTrack(stream.getAudioTracks()[0]);
         }
-        // let videoPlayerContainer = document.getElementById('videoPlayerContainer');
-        // document.body.appendChild(canvas);
-        // videoPlayerContainer.appendChild(canvas);
         this.captureButton(canvas, canvasStream, document.body);
       });
     });
   }
 
-  filterPicker = (videoElement, canvas, filters, appendTo) => {
+  filterPicker = (videoElement, canvas, filters, appendTo, stream) => {
     // hiding the filter initially
     let videoFilterContainer = document.getElementById('videoFilterContainer');
     videoFilterContainer.style.visibility = 'hidden';
-
 
     const changeFilter = f => {
       if (this.currentFilter) {
@@ -71,42 +73,110 @@ export class Video2Component implements OnInit {
       }
       this.currentFilter = filters[f](videoElement, canvas);
     };
-  
+
+
     const selector = document.getElementById('videoFilterContainer');
-    // selector.className = 'filterPicker';
+
     let f;
+
     for (f of Object.keys(filters)) {
       const option = document.createElement('div');
       option.className = 'filterOption';
       const span = document.createElement('span');
       span.innerHTML = f;
       option.appendChild(span);
+
+      
+      let videoFilterPlayer:any = document.createElement('video');
+      videoFilterPlayer.srcObject = stream;
+
+      videoFilterPlayer.setAttribute('playsinline', '');
+      setTimeout(() => {
+        videoFilterPlayer.play();
+      });
+      videoFilterPlayer.muted = true;
+      videoFilterPlayer.style.height = "0%";
+      videoFilterPlayer.style.width = "100%";
+      videoFilterPlayer.className = 'videoFilterPlayer';
+      let videoFilterCanvas = <HTMLCanvasElement> document.createElement('canvas');
+      filters[f](videoFilterPlayer,videoFilterCanvas);
+      videoFilterCanvas.style.height = "100%";
+      videoFilterCanvas.style.width = "100%";
+      option.appendChild(videoFilterCanvas);
+
       option.addEventListener('click', changeFilter.bind(this, f));
+      
       selector.appendChild(option);
+      
     }
-    // appendTo.appendChild(selector);
     changeFilter('Normal');
   };
   
+  copy(){
+    let videoPlayerCanvas = <HTMLCanvasElement> document.getElementById('videoPlayerCanvas');
+    let videoPlayerCanvasCtx = videoPlayerCanvas.getContext('2d');
+    
+    const displayData = <HTMLCanvasElement> document.getElementById('displayData');
+    let ctx = displayData.getContext("2d");
+    // ctx.drawImage(videoPlayerCanvas,0,0)
+    this.fitImageOn(displayData, videoPlayerCanvas,ctx);
+    filters['Fade'](videoPlayerCanvas,displayData);
+  }
+
   changeFilterStatus(){
     let videoFilterContainer = document.getElementById('videoFilterContainer');
-    console.log("videoFilterContainer.style.visibility:",JSON.stringify(videoFilterContainer.style.visibility) )
-
+    // changing the visibility of the filter selector
     videoFilterContainer.style.visibility == 'hidden' ? videoFilterContainer.style.visibility = 'visible':videoFilterContainer.style.visibility='hidden';
+    
+
   }
+
+
+  fitImageOn(canvas, imageObj, context) {
+    var imageAspectRatio = imageObj.width / imageObj.height;
+    var canvasAspectRatio = canvas.width / canvas.height;
+    var renderableHeight, renderableWidth, xStart, yStart;
+  
+    // If image's aspect ratio is less than canvas's we fit on height
+    // and place the image centrally along width
+    if(imageAspectRatio < canvasAspectRatio) {
+      renderableHeight = canvas.height;
+      renderableWidth = imageObj.width * (renderableHeight / imageObj.height);
+      xStart = (canvas.width - renderableWidth) / 2;
+      yStart = 0;
+    }
+  
+    // If image's aspect ratio is greater than canvas's we fit on width
+    // and place the image centrally along height
+    else if(imageAspectRatio > canvasAspectRatio) {
+      renderableWidth = canvas.width
+      renderableHeight = imageObj.height * (renderableWidth / imageObj.width);
+      xStart = 0;
+      yStart = (canvas.height - renderableHeight) / 2;
+    }
+  
+    // Happy path - keep aspect ratio
+    else {
+      renderableHeight = canvas.height;
+      renderableWidth = canvas.width;
+      xStart = 0;
+      yStart = 0;
+    }
+    context.drawImage(imageObj, xStart, yStart, renderableWidth, renderableHeight);
+  };
   
   captureButton(canvas, canvasStream, appendTo) {
 
     const videoButtonsContainer = document.getElementById('videoButtonsContainer');
     const captureBtn = document.getElementById('recordButton');
     let canvasElement = document.getElementById('videoPlayerCanvas');
-    let top =  canvasElement.clientHeight-120;
+    let top =  canvasElement.clientHeight-125;
     
     // videoButtonsContainer.style.left = 'calc(50% - 20px)';
     videoButtonsContainer.style.top = top+'px';
     videoButtonsContainer.style.visibility = 'visible';
 
-    let topFilter = top - 70;
+    let topFilter = top - 120;
     const videoFilterContainer = document.getElementById('videoFilterContainer');
     videoFilterContainer.style.top = topFilter+'px';
     const container = this.captureContainer(canvas, canvasStream, appendTo);
@@ -117,8 +187,24 @@ export class Video2Component implements OnInit {
     captureBtn.addEventListener('mouseup', () => {
       setTimeout(()=>{
         container.stopCapturing();
-        //appendTo.removeChild(recordingDiv);
-      },3000)
+        
+        if(this.intervalReference){
+          clearInterval(this.intervalReference);
+        }
+
+      }, this.TEMP_TIMER_SECONDS*1000);
+
+      // Start timer count
+      this.timerCount= this.TEMP_TIMER_SECONDS;
+      let timer = this.TEMP_TIMER_SECONDS;
+      this.intervalReference = setInterval(()=>{
+        timer--;
+        if(timer.toString().length <= 1){
+          this.timerCount = "0"+timer;
+        }else{
+          this.timerCount = timer;
+        }
+      },1000);
 
     });
     // appendTo.appendChild(captureBtn);
@@ -126,6 +212,8 @@ export class Video2Component implements OnInit {
 
 
   captureContainer(canvas, canvasStream, appendTo) {
+    // hiding download button initially
+    document.getElementById('downloadButtonContainerId').style.visibility = 'hidden';
     let captured;
     const capturingVideo = this.captureVideo(canvasStream);
   
@@ -134,9 +222,18 @@ export class Video2Component implements OnInit {
   
     const close = () => {
       document.getElementById('videoPlayerComponents').removeChild(container);
+
+      document.getElementById('videoFilterContainer').style.visibility = 'hidden';
+      // Show the buttons container 
+      document.getElementById('filterContainerId').style.visibility = 'visible';
+      document.getElementById('recordButtonContainerId').style.visibility = 'visible'; 
+      document.getElementById('downloadButtonContainerId').style.visibility = 'hidden';
+      
+      this.timerCount = '';
+      this.showCounter = true;  
     };
     const closeButton = document.createElement('i');
-    closeButton.className = 'closeButton ion-close-round';
+    closeButton.className = 'videoCloseButton';
     closeButton.addEventListener('click', close);
     container.appendChild(closeButton);
   
@@ -174,6 +271,13 @@ export class Video2Component implements OnInit {
         }).then(() => {
           container.appendChild(captured);
           document.getElementById('videoPlayerComponents').appendChild(container);
+          document.getElementById('videoFilterContainer').style.visibility = 'hidden';
+
+          document.getElementById('filterContainerId').style.visibility = 'hidden';
+          document.getElementById('recordButtonContainerId').style.visibility = 'hidden';
+          document.getElementById('downloadButtonContainerId').style.visibility = 'visible';
+          this.showCounter = false; 
+
         });
       },
     };
@@ -245,6 +349,13 @@ export class Video2Component implements OnInit {
     return image;
   };
   
-
+  getFilterOpenStatus(){
+    let videoFilterContainer = document.getElementById('videoFilterContainer');
+    if(videoFilterContainer.style.visibility == 'visible'){
+      return true;
+    }else{
+      return false;
+    } 
+  }
 }
 

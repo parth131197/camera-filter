@@ -1,23 +1,34 @@
-<div id="videoPlayerContainer" fxLayout="row" fxLayoutAlign="center center" class="video-player-container">
-  <div fxLayout="column" id="videoPlayerComponents" class="video-player-component-container" fxFlex="60" fxFlex.xs="90">
-      <video id="videoPlayer" class="video-player"></video>
-
-      <canvas id="videoPlayerCanvas" class="video-player-canvas"></canvas>
-      <div id="videoFilterContainer" class="videoFilterContainer" fxLayout="row" fxLayoutGap="10px" fxLayoutAlign="start center">
-
-      </div>
-      <div id="videoButtonsContainer" class="videoButtonsContainer" fxLayout="row" fxLayoutAlign="space-around center">
-        <div fxFlex="33.33" fxLayout="row" fxLayoutAlign="start center">
-          <div class="filterIcon" (click)="changeFilterStatus()"></div>
+<div fxLayout="row" fxLayout.xs="column" style="width: 100%; height: 100%;">
+  <section fxFlex="40" fxFlex.xs="100" fxLayoutAlign="center center">
+    <div style="font-size: 50px;font-family: sans-serif;  color:gray;text-align: center " fxFlex="100">
+      Smile
+    </div>
+  </section>
+  <section fxFlex="60"  fxFlex.xs="100" id="videoPlayerContainer" fxLayout="row" fxLayoutAlign="center center" class="video-player-container">
+    <div fxLayout="column" id="videoPlayerComponents" class="video-player-component-container" fxFlex="80" fxFlex.xs="96">
+        <video id="videoPlayer" class="video-player"></video>
+        <div *ngIf="showCounter" class="counter-display-container" fxLayout="row" fxLayoutAlign="center center">
+          <p class="timer-text">00:{{ timerCount || '00' }}  </p> 
         </div>
-        <div fxFlex="33.33" fxLayout="row" fxLayoutAlign="center center">
-          <div id="recordButton" class="record-button"></div>
+        <canvas id="videoPlayerCanvas" class="video-player-canvas"></canvas>
+        <div id="videoFilterContainer" class="videoFilterContainer" fxLayout="row" fxLayoutGap="10px" fxLayoutAlign="start center">
+  
         </div>
-        <div fxFlex="33.33" fxLayout="row" fxLayoutAlign="end center">
-          <button id="downloadButton" class="sendButton">Send</button>
+        <div id="videoButtonsContainer" class="videoButtonsContainer" fxLayout="row" fxLayoutAlign="space-around center">
+          <div id="filterContainerId" fxFlex="33.33" fxLayout="row" fxLayoutAlign="start center">
+            <div class="filterIcon" [ngClass]="{'dark-shade': getFilterOpenStatus()}" (click)="changeFilterStatus()"></div>
+          </div>
+          <div id="recordButtonContainerId" fxFlex="33.33" fxLayout="row" fxLayoutAlign="center center">
+            <div id="recordButton" class="record-button"></div>
+          </div>
+          <div id="downloadButtonContainerId" fxFlex="33.33" fxLayout="row" fxLayoutAlign="end center">
+            <button id="downloadButton" class="sendButton">Send</button>
+          </div>
         </div>
-      </div>
-  </div>
-  <!-- <div id="recordingDiv" class="recordingAnimation"></div> -->
+    </div>
+  </section>
 </div>
+
+
+
 
