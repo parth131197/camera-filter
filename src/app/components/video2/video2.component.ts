@@ -292,6 +292,7 @@ export class Video2Component implements OnInit {
       start: () => {
         if (typeof MediaRecorder === 'undefined') {
           // We can't capture video we don't suppor the MediaRecorder API
+          alert('The browser does not support camera recording');
           return false;
         }
         recordedBlobs = [];
