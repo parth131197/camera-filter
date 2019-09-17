@@ -17,6 +17,14 @@
     "lib": [
       "es2018",
       "dom"
-    ]
+    ],
+    "paths": {
+      "ngx-camera-filter": [
+        "dist/ngx-camera-filter"
+      ],
+      "ngx-camera-filter/*": [
+        "dist/ngx-camera-filter/*"
+      ]
+    }
   }
 }
