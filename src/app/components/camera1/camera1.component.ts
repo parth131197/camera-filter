@@ -77,9 +77,9 @@ export class Camera1Component implements OnInit {
         audio: {
           echoCancellation: {exact: hasEchoCancellation}
         },
-        video: {
-          width: 640, height: 480
-        }
+        // video: {
+        //   width: 640, height: 480
+        // }
       };
       console.log('Using media constraints:', constraints);
       await this.init(constraints);
@@ -149,11 +149,13 @@ handleSuccess(stream) {
 
   const gumVideo:any = document.querySelector('video#gum');
   gumVideo.srcObject = stream;
+  gumVideo.muted = true;
 }
 
 async init(constraints) {
   try {
-    const stream = await navigator.mediaDevices.getUserMedia(constraints);
+    const stream = await navigator.mediaDevices.getUserMedia({audio: true,
+      video: true});
     this.handleSuccess(stream);
   } catch (e) {
     console.error('navigator.getUserMedia error:', e);
