@@ -108,22 +108,22 @@ export class Camera1Component implements OnInit {
     const superBuffer = new Blob(this.recordedBlobs, {type: 'video/webm'});
 
 
-      const recordedVideo = document.createElement('video');
-      recordedVideo.className = 'recordedVideo';
-      recordedVideo.id = 'recorded';
+    const recordedVideo = document.createElement('video');
+    recordedVideo.className = 'recordedVideo';
+    recordedVideo.id = 'recorded';
 
-      recordedVideo.setAttribute('autoPlay', 'true');
-      recordedVideo.setAttribute('loop', 'true');
-      recordedVideo.setAttribute('controls', 'true');
-      recordedVideo.setAttribute('playsinline', '');
-              
-      recordedVideo.src = null;
-      recordedVideo.srcObject = null;
-      recordedVideo.src = window.URL.createObjectURL(superBuffer);
-      recordedVideo.controls = true;
-      recordedVideo.play();
+    recordedVideo.setAttribute('autoPlay', 'true');
+    recordedVideo.setAttribute('loop', 'true');
+    recordedVideo.setAttribute('controls', 'true');
+    recordedVideo.setAttribute('playsinline', '');
+            
+    recordedVideo.src = null;
+    recordedVideo.srcObject = null;
+    recordedVideo.src = window.URL.createObjectURL(superBuffer);
+    recordedVideo.controls = true;
+    recordedVideo.play();
 
-      document.getElementById('recorded-player-container').appendChild(recordedVideo);
+    document.getElementById('recorded-player-container').appendChild(recordedVideo);
   }
   handleSourceOpen(event) {
     console.log('MediaSource opened');
