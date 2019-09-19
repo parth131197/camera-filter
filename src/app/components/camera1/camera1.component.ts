@@ -13,23 +13,21 @@ export class Camera1Component implements OnInit {
    recordedBlobs: any;
    sourceBuffer: any;
    mediaSource: any;
-   errorMsgElement: any;
    recordButton: any;
    downloadButton: any;
-   playButton: any;
+  //  playButton: any;
   constructor() { }
 
   ngOnInit() {
     this.setupElements();
   }
 
-  setupElements(){
+  async setupElements(){
     this.mediaSource = new MediaSource();
     this.mediaSource.addEventListener('sourceopen',()=>{this.handleSourceOpen} , false);
 
 
-    this.errorMsgElement = document.querySelector('span#errorMsg');
-    const recordedVideo :any= document.querySelector('video#recorded');
+    // const recordedVideo :any= document.querySelector('video#recorded');
     this.recordButton = document.querySelector('button#record');
     this.recordButton.addEventListener('click', () => {
       if (this.recordButton.textContent === 'Start Recording') {
@@ -37,20 +35,33 @@ export class Camera1Component implements OnInit {
       } else {
         this.stopRecording();
         this.recordButton.textContent = 'Start Recording';
-        this.playButton.disabled = false;
+        // this.playButton.disabled = false;
         this.downloadButton.disabled = false;
       }
     });
 
-    this.playButton = document.getElementById('play');
-    this.playButton.addEventListener('click', () => {
+    // this.playButton = document.getElementById('play');
+    /*this.playButton.addEventListener('click', () => {
       const superBuffer = new Blob(this.recordedBlobs, {type: 'video/webm'});
+
+
+      const recordedVideo = document.createElement('video');
+      recordedVideo.className = 'recordedVideo';
+      recordedVideo.id = 'recorded';
+
+      recordedVideo.setAttribute('autoPlay', 'true');
+      recordedVideo.setAttribute('loop', 'true');
+      recordedVideo.setAttribute('controls', 'true');
+      recordedVideo.setAttribute('playsinline', '');
+              
       recordedVideo.src = null;
       recordedVideo.srcObject = null;
       recordedVideo.src = window.URL.createObjectURL(superBuffer);
       recordedVideo.controls = true;
       recordedVideo.play();
-    });
+
+      document.getElementById('recorded-player-container').appendChild(recordedVideo);
+    });*/
 
     this.downloadButton = document.querySelector('button#download');
     this.downloadButton.addEventListener('click', () => {
@@ -69,98 +80,135 @@ export class Camera1Component implements OnInit {
     });
 
 
+    
+      const constraints = {
+        audio: {
+          echoCancellation: {exact: true}
+        },
+        video: true
+      };
+      console.log('Using media constraints:', constraints);
+      await this.init(constraints);
 
-    document.querySelector('button#start').addEventListener('click', async () => {
+    /*document.querySelector('button#start').addEventListener('click', async () => {
       let echo: any = document.querySelector('#echoCancellation'); 
       const hasEchoCancellation = echo.checked;
       const constraints = {
         audio: {
           echoCancellation: {exact: hasEchoCancellation}
         },
-        // video: {
-        //   width: 640, height: 480
-        // }
+        video: true
       };
       console.log('Using media constraints:', constraints);
       await this.init(constraints);
-    });
+    });*/
   }
 
-handleSourceOpen(event) {
-  console.log('MediaSource opened');
-  this.sourceBuffer = this.mediaSource.addSourceBuffer('video/webm; codecs="vp8"');
-  console.log('Source buffer: ', this.sourceBuffer);
-}
+  playVideo(){
+    const superBuffer = new Blob(this.recordedBlobs, {type: 'video/webm'});
 
-handleDataAvailable = (event)=> {
-  if (event.data && event.data.size > 0) {
-    this.recordedBlobs.push(event.data);
+
+      const recordedVideo = document.createElement('video');
+      recordedVideo.className = 'recordedVideo';
+      recordedVideo.id = 'recorded';
+
+      recordedVideo.setAttribute('autoPlay', 'true');
+      recordedVideo.setAttribute('loop', 'true');
+      recordedVideo.setAttribute('controls', 'true');
+      recordedVideo.setAttribute('playsinline', '');
+              
+      recordedVideo.src = null;
+      recordedVideo.srcObject = null;
+      recordedVideo.src = window.URL.createObjectURL(superBuffer);
+      recordedVideo.controls = true;
+      recordedVideo.play();
+
+      document.getElementById('recorded-player-container').appendChild(recordedVideo);
   }
-}
+  handleSourceOpen(event) {
+    console.log('MediaSource opened');
+    this.sourceBuffer = this.mediaSource.addSourceBuffer('video/webm; codecs="vp8"');
+    console.log('Source buffer: ', this.sourceBuffer);
+  }
 
-startRecording() {
-  this.recordedBlobs = [];
-  let options = {mimeType: 'video/webm;codecs=vp9'};
-  if (!MediaRecorder.isTypeSupported(options.mimeType)) {
-    console.error(`${options.mimeType} is not Supported`);
-    this.errorMsgElement.innerHTML = `${options.mimeType} is not Supported`;
-    options = {mimeType: 'video/webm;codecs=vp8'};
-    if (!MediaRecorder.isTypeSupported(options.mimeType)) {
-      console.error(`${options.mimeType} is not Supported`);
-      this.errorMsgElement.innerHTML = `${options.mimeType} is not Supported`;
-      options = {mimeType: 'video/webm'};
-      if (!MediaRecorder.isTypeSupported(options.mimeType)) {
-        console.error(`${options.mimeType} is not Supported`);
-        this.errorMsgElement.innerHTML = `${options.mimeType} is not Supported`;
-        options = {mimeType: ''};
-      }
+  handleDataAvailable = (event)=> {
+    if (event.data && event.data.size > 0) {
+      this.recordedBlobs.push(event.data);
     }
   }
 
-  try {
-    this.mediaRecorder = new MediaRecorder(window.stream, options);
-  } catch (e) {
-    console.error('Exception while creating MediaRecorder:', e);
-    this.errorMsgElement.innerHTML = `Exception while creating MediaRecorder: ${JSON.stringify(e)}`;
-    return;
+  startRecording() {
+    this.recordedBlobs = [];
+    let options = {mimeType: 'video/webm;codecs=vp9'};
+    if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+      console.error(`${options.mimeType} is not Supported`);
+      alert(`${options.mimeType} is not Supported`);
+      options = {mimeType: 'video/webm;codecs=vp8'};
+      if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+        console.error(`${options.mimeType} is not Supported`);
+        alert(`${options.mimeType} is not Supported`);
+        options = {mimeType: 'video/webm'};
+        if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+          console.error(`${options.mimeType} is not Supported`);
+          alert(`${options.mimeType} is not Supported`);
+          options = {mimeType: ''};
+        }
+      }
+    }
+
+    try {
+      this.mediaRecorder = new MediaRecorder(window.stream, options);
+    } catch (e) {
+      console.error('Exception while creating MediaRecorder:', e);
+      alert(`Exception while creating MediaRecorder: ${JSON.stringify(e)}`);
+      return;
+    }
+
+    console.log('Created MediaRecorder', this.mediaRecorder, 'with options', options);
+    this.recordButton.textContent = 'Stop Recording';
+    // this.playButton.disabled = true;
+    this.downloadButton.disabled = true;
+    this.mediaRecorder.onstop = (event) => {
+      console.log('Recorder stopped: ', event);
+      this.playVideo();
+    };
+    this.mediaRecorder.ondataavailable = this.handleDataAvailable;
+    this.mediaRecorder.start(10); // collect 10ms of data
+    console.log('MediaRecorder started', this.mediaRecorder);
   }
 
-  console.log('Created MediaRecorder', this.mediaRecorder, 'with options', options);
-  this.recordButton.textContent = 'Stop Recording';
-  this.playButton.disabled = true;
-  this.downloadButton.disabled = true;
-  this.mediaRecorder.onstop = (event) => {
-    console.log('Recorder stopped: ', event);
-  };
-  this.mediaRecorder.ondataavailable = this.handleDataAvailable;
-  this.mediaRecorder.start(10); // collect 10ms of data
-  console.log('MediaRecorder started', this.mediaRecorder);
-}
-
-stopRecording() {
-  this.mediaRecorder.stop();
-  console.log('Recorded Blobs: ', this.recordedBlobs);
-}
-
-handleSuccess(stream) {
-  this.recordButton.disabled = false;
-  console.log('getUserMedia() got stream:', stream);
-  window.stream = stream;
-
-  const gumVideo:any = document.querySelector('video#gum');
-  gumVideo.srcObject = stream;
-  gumVideo.muted = true;
-}
-
-async init(constraints) {
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia({audio: true,
-      video: true});
-    this.handleSuccess(stream);
-  } catch (e) {
-    console.error('navigator.getUserMedia error:', e);
-    this.errorMsgElement.innerHTML = `navigator.getUserMedia error:${e.toString()}`;
+  stopRecording() {
+    this.mediaRecorder.stop();
+    console.log('Recorded Blobs: ', this.recordedBlobs);
   }
-}
+
+  handleSuccess(stream) {
+    this.recordButton.disabled = false;
+    console.log('getUserMedia() got stream:', stream);
+    window.stream = stream;
+
+    const gumVideo:any = document.querySelector('video#gum');
+    gumVideo.srcObject = stream;
+    gumVideo.muted = true;
+  }
+
+  async init(constraints) {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      this.handleSuccess(stream);
+    } catch (e) {
+      console.error('navigator.getUserMedia error:', e);
+      alert(`navigator.getUserMedia error:${e.toString()}`)
+    }
+  }
+  closeVideo(){
+    // document.getElementById('recorded').style.visibility = 'hidden';
+    let recordedVideo: any = document.getElementById('recorded');
+    document.getElementById('recorded-player-container').removeChild(recordedVideo);
+    // recordedVideo.src = null;
+    // recordedVideo.srcObject = null;
+    this.recordedBlobs = [];
+    
+  }
 
 }

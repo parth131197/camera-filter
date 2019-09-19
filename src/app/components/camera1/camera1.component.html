@@ -1,32 +1,20 @@
-<div id="container">
+<div fxLayout="column" style="height: 100%">
+  <div class="container" fxLayout="row" fxLayoutAlign="center start">
+    <div class="video-container" fxFlex="60" fxFlex.xs="100">
+      <div class="video-display-container">
+          <video id="gum" class="video-player" playsinline autoplay muted></video>
+      </div>
+        
+      <div id="recorded-player-container" class="recorded-player-container">
+      </div>
 
-  <h1><a href="//webrtc.github.io/samples/" title="WebRTC samples homepage">WebRTC samples</a>
-      <span>MediaRecorder</span></h1>
-
-  <p>For more information see the MediaStream Recording API <a
-          href="http://w3c.github.io/mediacapture-record/MediaRecorder.html"
-          title="W3C MediaStream Recording API Editor's Draft">Editor's&nbsp;Draft</a>.</p>
-
-  <video id="gum" class="video-player" playsinline autoplay muted></video>
-  <video id="recorded" playsinline loop></video>
-
+    </div>
+  </div>
   <div>
       <button id="start">Start camera</button>
       <button id="record" disabled>Start Recording</button>
-      <button id="play" disabled>Play</button>
+      <!-- <button id="play" disabled>Play</button> -->
       <button id="download" disabled>Download</button>
+      <button (click)="closeVideo()">Close</button>
   </div>
-
-  <div>
-      <h4>Media Stream Constraints options</h4>
-      <p>Echo cancellation: <input type="checkbox" id="echoCancellation"></p>
-  </div>
-
-  <div>
-      <span id="errorMsg"></span>
-  </div>
-
-  <a href="https://github.com/webrtc/samples/tree/gh-pages/src/content/getusermedia/record"
-     title="View source for this page on GitHub" id="viewSource">View source on GitHub</a>
-
 </div>
