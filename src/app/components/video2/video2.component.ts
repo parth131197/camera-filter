@@ -11,7 +11,7 @@ declare var MediaRecorder: any;
 })
 export class Video2Component implements OnInit {
 
-  public readonly TEMP_TIMER_SECONDS:any = 13;
+  public readonly TEMP_TIMER_SECONDS:any = 3;
 
   currentFilter;
   timerCount = this.TEMP_TIMER_SECONDS;
@@ -296,7 +296,7 @@ export class Video2Component implements OnInit {
           return false;
         }
         recordedBlobs = [];
-        const options = { mimeType: 'video/webm;codecs=vp8' };
+        const options = { mimeType: 'video/webm;codecs=vp9' };
         mediaRecorder = new MediaRecorder(canvasStream, options);
         mediaRecorder.addEventListener('dataavailable', event => {
           if (event.data && event.data.size > 0) {
@@ -315,7 +315,7 @@ export class Video2Component implements OnInit {
               recordedVideo.setAttribute('autoPlay', 'true');
               recordedVideo.setAttribute('loop', 'true');
               recordedVideo.setAttribute('controls', 'true');
-              const superBuffer = new Blob(recordedBlobs, { type: 'video/webm' });
+              const superBuffer = new Blob(recordedBlobs, { type: 'video/webm;codecs=vp9' });
               recordedVideo.src = window.URL.createObjectURL(superBuffer);
               capturePromise.resolve(recordedVideo);
             } else {
