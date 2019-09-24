@@ -8,10 +8,22 @@
       <div id="recorded-player-container" class="recorded-player-container">
       </div>
 
+      <!-- Buttons section -->
+      <div id="videoButtonsContainer" class="videoButtonsContainer" fxLayout="row" fxLayoutAlign="space-around center">
+        <div id="filterContainerId" fxFlex="33.33" fxLayout="row" fxLayoutAlign="start center">
+          <div class="filterIcon"></div>
+        </div>
+        <div id="recordButtonContainerId" fxFlex="33.33" fxLayout="row" fxLayoutAlign="center center">
+          <div class="record-button"></div>
+        </div>
+        <div id="downloadButtonContainerId" fxFlex="33.33" fxLayout="row" fxLayoutAlign="end center">
+          <button class="sendButton" (click)="sendVideo()">Send</button>
+        </div>
+      </div>
+
     </div>
   </div>
   <div>
-      <button id="start">Start camera</button>
       <button id="record" disabled>Start Recording</button>
       <!-- <button id="play" disabled>Play</button> -->
       <button id="download" disabled>Download</button>

@@ -211,4 +211,8 @@ export class Camera1Component implements OnInit {
     
   }
 
+  sendVideo(){
+    console.log('Send clicked');
+  }
+
 }
