@@ -13,8 +13,12 @@ export class Camera1Component implements OnInit {
    recordedBlobs: any;
    sourceBuffer: any;
    mediaSource: any;
-   recordButton: any;
-   downloadButton: any;
+  //  downloadButton: any;
+   showVideoButtons: boolean = false;
+   showCrossButton: boolean = false;
+   videoRecordingStatus: boolean =  false;
+   timerValue: number = 5;
+   intervalSub: any;
   //  playButton: any;
   constructor() { }
 
@@ -26,19 +30,6 @@ export class Camera1Component implements OnInit {
     this.mediaSource = new MediaSource();
     this.mediaSource.addEventListener('sourceopen',()=>{this.handleSourceOpen} , false);
 
-
-    // const recordedVideo :any= document.querySelector('video#recorded');
-    this.recordButton = document.querySelector('button#record');
-    this.recordButton.addEventListener('click', () => {
-      if (this.recordButton.textContent === 'Start Recording') {
-        this.startRecording();
-      } else {
-        this.stopRecording();
-        this.recordButton.textContent = 'Start Recording';
-        // this.playButton.disabled = false;
-        this.downloadButton.disabled = false;
-      }
-    });
 
     // this.playButton = document.getElementById('play');
     /*this.playButton.addEventListener('click', () => {
@@ -62,46 +53,45 @@ export class Camera1Component implements OnInit {
 
       document.getElementById('recorded-player-container').appendChild(recordedVideo);
     });*/
-
-    this.downloadButton = document.querySelector('button#download');
-    this.downloadButton.addEventListener('click', () => {
-      const blob = new Blob(this.recordedBlobs, {type: 'video/webm'});
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.style.display = 'none';
-      a.href = url;
-      a.download = 'test.webm';
-      document.body.appendChild(a);
-      a.click();
-      setTimeout(() => {
-        document.body.removeChild(a);
-        window.URL.revokeObjectURL(url);
-      }, 100);
-    });
-
-
     
-      const constraints = {
-        audio: {
-          echoCancellation: {exact: true}
-        },
-        video: true
-      };
-      console.log('Using media constraints:', constraints);
-      await this.init(constraints);
+    const constraints = {
+      audio: {
+        echoCancellation: {exact: true}
+      },
+      video: true
+    };
+    console.log('Using media constraints:', constraints);
+    await this.init(constraints);
 
-    /*document.querySelector('button#start').addEventListener('click', async () => {
-      let echo: any = document.querySelector('#echoCancellation'); 
-      const hasEchoCancellation = echo.checked;
-      const constraints = {
-        audio: {
-          echoCancellation: {exact: hasEchoCancellation}
-        },
-        video: true
-      };
-      console.log('Using media constraints:', constraints);
-      await this.init(constraints);
-    });*/
+  }
+
+  startButtonClicked(){
+    // if (!this.videoRecordingStatus) {
+    //   this.showCrossButton = false;
+    //   this.showVideoButtons = true;
+    //   this.videoRecordingStatus = true;
+    //   this.startRecording();
+    // } else {
+    //   this.stopRecording();
+    //   this.showCrossButton = true;
+    //   this.videoRecordingStatus = false;
+    //   this.downloadButton.disabled = false;
+    // }
+
+    this.showCrossButton = false;
+    this.showVideoButtons = true;
+    this.videoRecordingStatus = true;
+    this.startRecording();
+
+    setTimeout(()=>{
+      this.stopRecording();
+      this.showCrossButton = true;
+      this.videoRecordingStatus = false;
+    }, this.timerValue*1000);
+
+    this.intervalSub = setInterval(()=>{
+      this.timerValue--;
+    },1000);
   }
 
   playVideo(){
@@ -165,9 +155,7 @@ export class Camera1Component implements OnInit {
     }
 
     console.log('Created MediaRecorder', this.mediaRecorder, 'with options', options);
-    this.recordButton.textContent = 'Stop Recording';
     // this.playButton.disabled = true;
-    this.downloadButton.disabled = true;
     this.mediaRecorder.onstop = (event) => {
       console.log('Recorder stopped: ', event);
       this.playVideo();
@@ -179,11 +167,13 @@ export class Camera1Component implements OnInit {
 
   stopRecording() {
     this.mediaRecorder.stop();
+    if(this.intervalSub){
+      clearInterval(this.intervalSub);
+    }
     console.log('Recorded Blobs: ', this.recordedBlobs);
   }
 
   handleSuccess(stream) {
-    this.recordButton.disabled = false;
     console.log('getUserMedia() got stream:', stream);
     window.stream = stream;
 
@@ -204,15 +194,36 @@ export class Camera1Component implements OnInit {
   closeVideo(){
     // document.getElementById('recorded').style.visibility = 'hidden';
     let recordedVideo: any = document.getElementById('recorded');
-    document.getElementById('recorded-player-container').removeChild(recordedVideo);
     // recordedVideo.src = null;
     // recordedVideo.srcObject = null;
+    document.getElementById('recorded-player-container').removeChild(recordedVideo);
+
     this.recordedBlobs = [];
+    this.showCrossButton = false;
+    this.showVideoButtons = false;
+    this.timerValue = 5;
     
   }
 
   sendVideo(){
     console.log('Send clicked');
+    const blob = new Blob(this.recordedBlobs, {type: 'video/webm'});
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      a.download = 'test.webm';
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => {
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+      }, 100);
   }
 
+  getTimerValue(){
+    if(this.timerValue.toString().length < 2){
+      return '0'+this.timerValue;
+    }else return this.timerValue;
+  }
 }

@@ -1,6 +1,15 @@
 <div fxLayout="column" style="height: 100%">
   <div class="container" fxLayout="row" fxLayoutAlign="center start">
     <div class="video-container" fxFlex="60" fxFlex.xs="100">
+      <div class="cross-button-container" fxLayout="row" fxLayoutAlign="space-between center">
+        <div>
+          <div *ngIf="showCrossButton" (click)="closeVideo()" class="cross-icon"></div>
+        </div>
+        <div>
+          <p *ngIf="!showCrossButton" class="timer-text">00:{{getTimerValue() || '00'}}</p>
+        </div>
+        <div></div>
+      </div>
       <div class="video-display-container">
           <video id="gum" class="video-player" playsinline autoplay muted></video>
       </div>
@@ -11,22 +20,21 @@
       <!-- Buttons section -->
       <div id="videoButtonsContainer" class="videoButtonsContainer" fxLayout="row" fxLayoutAlign="space-around center">
         <div id="filterContainerId" fxFlex="33.33" fxLayout="row" fxLayoutAlign="start center">
-          <div class="filterIcon"></div>
+          <div *ngIf="!showVideoButtons" class="filterIcon"></div>
         </div>
         <div id="recordButtonContainerId" fxFlex="33.33" fxLayout="row" fxLayoutAlign="center center">
-          <div class="record-button"></div>
+          <div *ngIf="!showVideoButtons" (click)="startButtonClicked()" class="record-button"></div>
         </div>
         <div id="downloadButtonContainerId" fxFlex="33.33" fxLayout="row" fxLayoutAlign="end center">
-          <button class="sendButton" (click)="sendVideo()">Send</button>
+          <button *ngIf="showCrossButton" class="sendButton" (click)="sendVideo()">Send</button>
         </div>
       </div>
 
     </div>
   </div>
   <div>
-      <button id="record" disabled>Start Recording</button>
       <!-- <button id="play" disabled>Play</button> -->
       <button id="download" disabled>Download</button>
-      <button (click)="closeVideo()">Close</button>
+      <!-- <button (click)="closeVideo()">Close</button> -->
   </div>
 </div>
